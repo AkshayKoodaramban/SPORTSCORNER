@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 	"sportscorner/pkg/usecase/services"
 	"sportscorner/pkg/utils/response"
@@ -22,7 +23,7 @@ func (p *PaymentHandler) MakePaymentRazorPay(c *gin.Context) {
 
 	orderID := c.Query("id")
 	userID := c.Query("user_id")
-
+	
 	orderDetail, err := p.usecase.MakePaymentRazorPay(orderID, userID)
 	if err != nil {
 		errorRes := response.ClientResponse(http.StatusInternalServerError, "could not generate order details", nil, err.Error())
@@ -35,11 +36,18 @@ func (p *PaymentHandler) MakePaymentRazorPay(c *gin.Context) {
 
 func (p *PaymentHandler) VerifyPayment(c *gin.Context) {
 
+	fmt.Println("verifying")
+
 	orderID := c.Query("order_id")
 	paymentID := c.Query("payment_id")
 	razorID := c.Query("razor_id")
 
+	fmt.Println(paymentID)
+	fmt.Println(razorID)
+	fmt.Println(orderID)
+
 	err := p.usecase.VerifyPayment(paymentID, razorID, orderID)
+
 	if err != nil {
 		errorRes := response.ClientResponse(http.StatusInternalServerError, "could not update payment details", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, errorRes)

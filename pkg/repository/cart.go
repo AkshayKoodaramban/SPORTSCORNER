@@ -30,28 +30,20 @@ func (ad *cartRepository) GetAddresses(id int) ([]models.Address, error) {
 }
 
 func (ad *cartRepository) GetCart(id int) ([]models.GetCart, error) {
-    var cart []models.GetCart
+	var cart []models.GetCart
 
-    query := `
-        SELECT
-            p.product_name,
-            li.quantity,
-            (li.quantity * p.price) AS total_price
-        FROM
-            line_items AS li
-        JOIN
-            products AS p ON li.inventory_id = p.id
-        WHERE
-            li.user_id = ?
-    `
+	if err := ad.DB.Raw(`
+	SELECT products.product_name, line_items.quantity, (line_items.quantity * products.price) AS Total
+	FROM line_items
+	JOIN products ON line_items.inventory_id = products.id
+	WHERE cart_id = ?
+`, id).Scan(&cart).Error; err != nil {
 
-    if err := ad.DB.Raw(query, id).Scan(&cart).Error; err != nil {
-        return []models.GetCart{}, err
-    }
+		return []models.GetCart{}, err
+	}
 
-    return cart, nil
+	return cart, nil
 }
-
 
 func (ad *cartRepository) GetPaymentOptions() ([]models.PaymentMethod, error) {
 
@@ -99,4 +91,12 @@ func (i *cartRepository) AddLineItems(cart_id, inventory_id int) error {
 	}
 
 	return nil
+}
+
+func (i *cartRepository) CheckProductInCart(user_id, inv_id int) bool {
+	var count int
+	if err := i.DB.Raw("SELECT count(*) FROM line_items li JOIN carts c ON li.cart_id = c.id WHERE c.user_id = $1 AND li.inventory_id = $2", user_id, inv_id).Scan(&count).Error; err != nil {
+		return false
+	}
+	return count > 0
 }

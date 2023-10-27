@@ -15,18 +15,51 @@ type Order struct {
 	Address         Address       `json:"-" gorm:"foreignkey:AddressID"`
 	PaymentMethodID uint          `json:"paymentmethod_id"`
 	PaymentMethod   PaymentMethod `json:"-" gorm:"foreignkey:PaymentMethodID"`
-	CouponUsed      string        `json:"coupon_used" gorm:"default:null"`
+	// CouponUsed      string        `json:"coupon_used" gorm:"default:null"`
 	FinalPrice      float64       `json:"price"`
 	OrderStatus     string        `json:"order_status" gorm:"order_status:4;default:'PENDING';check:order_status IN ('PENDING', 'SHIPPED','DELIVERED','CANCELED','RETURNED')"`
 	PaymentStatus   string        `json:"payment_status" gorm:"payment_status:2;default:'NOT PAID';check:payment_status IN ('PAID', 'NOT PAID')"`
 }
 
 type OrderItem struct {
-	ID          uint     `json:"id" gorm:"primaryKey;autoIncrement"`
-	OrderID     uint     `json:"order_id"`
-	Order       Order    `json:"-" gorm:"foreignkey:OrderID;constraint:OnDelete:CASCADE"`
-	InventoryID uint     `json:"inventory_id"`
+	ID          uint    `json:"id" gorm:"primaryKey;autoIncrement"`
+	OrderID     uint    `json:"order_id"`
+	Order       Order   `json:"-" gorm:"foreignkey:OrderID;constraint:OnDelete:CASCADE"`
+	InventoryID uint    `json:"inventory_id"`
 	Inventories Product `json:"-" gorm:"foreignkey:InventoryID"`
-	Quantity    int      `json:"quantity"`
-	TotalPrice  float64  `json:"total_price"`
+	Quantity    int     `json:"quantity"`
+	TotalPrice  float64 `json:"total_price"`
+}
+
+type AdminOrdersResponse struct {
+	Pending   []OrderDetails
+	Shipped   []OrderDetails
+	Delivered []OrderDetails
+	Canceled  []OrderDetails
+	Returned  []OrderDetails
+}
+
+type OrderDetails struct {
+	Id            int     `json:"order-id"`
+	Username      string  `json:"name"`
+	Address       string  `json:"address"`
+	Paymentmethod string  `json:"payment_method"`
+	Total         float64 `json:"total"`
+	
+}
+
+
+type CombinedOrderDetails struct {
+	OrderId        string  `json:"order_id"`
+	FinalPrice     float64 `json:"final_price"`
+	ShipmentStatus string  `json:"shipment_status"`
+	PaymentStatus  string  `json:"payment_status"`
+	Name           string  `json:"name"`
+	Email          string  `json:"email"`
+	Phone          string  `json:"phone"`
+	HouseName      string  `json:"house_name" validate:"required"`
+	State          string  `json:"state" validate:"required"`
+	Pin            string  `json:"pin" validate:"required"`
+	Street         string  `json:"street"`
+	City           string  `json:"city"`
 }

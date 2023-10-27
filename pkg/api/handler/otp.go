@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"net/http"
 	"sportscorner/pkg/usecase/services"
 	"sportscorner/pkg/utils/models"
@@ -41,7 +40,6 @@ func (ot *OtpHandler) SendOTP(c *gin.Context) {
 }
 
 func (ot *OtpHandler) VerifyOTP(c *gin.Context) {
-	fmt.Println(1)
 
 	var code models.VerifyData
 	if err := c.BindJSON(&code); err != nil {

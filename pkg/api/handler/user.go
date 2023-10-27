@@ -64,7 +64,7 @@ func (u *UserHandler) LoginHandler(c *gin.Context) {
 	var user models.UserLogin
 
 	if err := c.BindJSON(&user); err != nil {
-		errResponse := response.ClientResponse(http.StatusBadRequest,"field provided are in wrong format", nil, err.Error())
+		errResponse := response.ClientResponse(http.StatusBadRequest, "field provided are in wrong format", nil, err.Error())
 		c.JSON(http.StatusBadRequest, errResponse)
 	}
 
@@ -86,12 +86,16 @@ func (u *UserHandler) LoginHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, successResponse)
 }
 func (i *UserHandler) AddAddress(c *gin.Context) {
-	id, err := strconv.Atoi(c.Query("id"))
-	if err != nil {
-		errorRes := response.ClientResponse(http.StatusBadRequest, "check path parameter", nil, err.Error())
+
+	idValue, ok := c.Get("id")
+
+	if !ok {
+		errorRes := response.ClientResponse(http.StatusBadRequest, "check your id again", nil, nil)
 		c.JSON(http.StatusBadRequest, errorRes)
 		return
 	}
+
+	id, _ := idValue.(int)
 
 	var address models.AddAddress
 	if err := c.BindJSON(&address); err != nil {
@@ -111,14 +115,22 @@ func (i *UserHandler) AddAddress(c *gin.Context) {
 }
 
 func (i *UserHandler) GetAddresses(c *gin.Context) {
-	idString := c.Query("id")
-	id, err := strconv.Atoi(idString)
-	if err != nil {
-		errorRes := response.ClientResponse(http.StatusBadRequest, "check your id again", nil, err.Error())
+	// idString := c.Query("id")
+	// id, err := strconv.Atoi(idString)
+	// if err != nil {
+	// 	errorRes := response.ClientResponse(http.StatusBadRequest, "check your id again", nil, err.Error())
+	// 	c.JSON(http.StatusBadRequest, errorRes)
+	// 	return
+	// }
+	idValue, ok := c.Get("id")
+
+	if !ok {
+		errorRes := response.ClientResponse(http.StatusBadRequest, "check your id again", nil, nil)
 		c.JSON(http.StatusBadRequest, errorRes)
 		return
 	}
 
+	id, _ := idValue.(int)
 	addresses, err := i.UserUseCase.GetAddresses(id)
 	if err != nil {
 		errorRes := response.ClientResponse(http.StatusBadRequest, "could not retrieve records", nil, err.Error())
@@ -130,14 +142,14 @@ func (i *UserHandler) GetAddresses(c *gin.Context) {
 }
 
 func (i *UserHandler) GetUserDetails(c *gin.Context) {
-	idString := c.Query("id")
-	id, err := strconv.Atoi(idString)
-	if err != nil {
-		errorRes := response.ClientResponse(http.StatusBadRequest, "check your id again", nil, err.Error())
+	idValue, ok := c.Get("id")
+
+	if !ok {
+		errorRes := response.ClientResponse(http.StatusBadRequest, "check your id again", nil, nil)
 		c.JSON(http.StatusBadRequest, errorRes)
 		return
 	}
-
+	id, _ := idValue.(int)
 	details, err := i.UserUseCase.GetUserDetails(id)
 	if err != nil {
 		errorRes := response.ClientResponse(http.StatusBadRequest, "could not retrieve records", nil, err.Error())
@@ -150,12 +162,13 @@ func (i *UserHandler) GetUserDetails(c *gin.Context) {
 
 func (i *UserHandler) EditName(c *gin.Context) {
 
-	id, err := strconv.Atoi(c.Query("id"))
-	if err != nil {
-		errorRes := response.ClientResponse(http.StatusBadRequest, "check path parameter", nil, err.Error())
+	idValue, ok := c.Get("id")
+	if !ok {
+		errorRes := response.ClientResponse(http.StatusBadRequest, "check your id again", nil, nil)
 		c.JSON(http.StatusBadRequest, errorRes)
 		return
 	}
+	id, _ := idValue.(int)
 
 	var model models.EditName
 	if err := c.BindJSON(&model); err != nil {
@@ -176,12 +189,13 @@ func (i *UserHandler) EditName(c *gin.Context) {
 
 func (i *UserHandler) EditEmail(c *gin.Context) {
 
-	id, err := strconv.Atoi(c.Query("id"))
-	if err != nil {
-		errorRes := response.ClientResponse(http.StatusBadRequest, "check path parameter", nil, err.Error())
+	idValue, ok := c.Get("id")
+	if !ok {
+		errorRes := response.ClientResponse(http.StatusBadRequest, "check your id again", nil, nil)
 		c.JSON(http.StatusBadRequest, errorRes)
 		return
 	}
+	id, _ := idValue.(int)
 
 	var model models.EditEmail
 	if err := c.BindJSON(&model); err != nil {
@@ -203,12 +217,13 @@ func (i *UserHandler) EditEmail(c *gin.Context) {
 
 func (i *UserHandler) EditPhone(c *gin.Context) {
 
-	id, err := strconv.Atoi(c.Query("id"))
-	if err != nil {
-		errorRes := response.ClientResponse(http.StatusBadRequest, "check path parameter", nil, err.Error())
+	idValue, ok := c.Get("id")
+	if !ok {
+		errorRes := response.ClientResponse(http.StatusBadRequest, "check your id again", nil, nil)
 		c.JSON(http.StatusBadRequest, errorRes)
 		return
 	}
+	id, _ := idValue.(int)
 
 	var model models.EditPhone
 	if err := c.BindJSON(&model); err != nil {
@@ -229,12 +244,19 @@ func (i *UserHandler) EditPhone(c *gin.Context) {
 }
 
 func (i *UserHandler) GetCart(c *gin.Context) {
-	id, err := strconv.Atoi(c.Query("id"))
-	if err != nil {
-		errorRes := response.ClientResponse(http.StatusBadRequest, "check parameters properly", nil, err.Error())
+	// id, err := strconv.Atoi(c.Query("id"))
+	// if err != nil {
+	// 	errorRes := response.ClientResponse(http.StatusBadRequest, "check parameters properly", nil, err.Error())
+	// 	c.JSON(http.StatusBadRequest, errorRes)
+	// 	return
+	// }
+	idValue, ok := c.Get("id")
+	if !ok {
+		errorRes := response.ClientResponse(http.StatusBadRequest, "check your id again", nil, nil)
 		c.JSON(http.StatusBadRequest, errorRes)
 		return
 	}
+	id, _ := idValue.(int)
 
 	products, err := i.UserUseCase.GetCart(id)
 	if err != nil {
@@ -242,21 +264,29 @@ func (i *UserHandler) GetCart(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, errorRes)
 		return
 	}
-	
+
 	successRes := response.ClientResponse(http.StatusOK, "Successfully got all products in cart", products, nil)
 	c.JSON(http.StatusOK, successRes)
 }
 
 func (i *UserHandler) RemoveFromCart(c *gin.Context) {
 
-	id, err := strconv.Atoi(c.Query("id"))
+	idValue, ok := c.Get("id")
+
+	if !ok {
+		errorRes := response.ClientResponse(http.StatusBadRequest, "check your id again", nil, nil)
+		c.JSON(http.StatusBadRequest, errorRes)
+		return
+	}
+	id, _ := idValue.(int)
+	inv_id, err := strconv.Atoi(c.Query("inv_id"))
 	if err != nil {
 		errorRes := response.ClientResponse(http.StatusBadRequest, "check parameters properly", nil, err.Error())
 		c.JSON(http.StatusBadRequest, errorRes)
 		return
 	}
 
-	if err := i.UserUseCase.RemoveFromCart(id); err != nil {
+	if err := i.UserUseCase.RemoveFromCart(id, inv_id); err != nil {
 		errorRes := response.ClientResponse(http.StatusBadRequest, "could not remove from cart", nil, err.Error())
 		c.JSON(http.StatusBadRequest, errorRes)
 		return
@@ -268,12 +298,20 @@ func (i *UserHandler) RemoveFromCart(c *gin.Context) {
 }
 
 func (i *UserHandler) UpdateQuantityAdd(c *gin.Context) {
-	id, err := strconv.Atoi(c.Query("id"))
-	if err != nil {
-		errorRes := response.ClientResponse(http.StatusBadRequest, "check parameters properly", nil, err.Error())
+	// id, err := strconv.Atoi(c.Query("id"))
+	// if err != nil {
+	// 	errorRes := response.ClientResponse(http.StatusBadRequest, "check parameters properly", nil, err.Error())
+	// 	c.JSON(http.StatusBadRequest, errorRes)
+	// 	return
+	// }
+	idValue, ok := c.Get("id")
+	if !ok {
+		errorRes := response.ClientResponse(http.StatusBadRequest, "check your id again", nil, nil)
 		c.JSON(http.StatusBadRequest, errorRes)
 		return
 	}
+	id, _ := idValue.(int)
+
 	inv, err := strconv.Atoi(c.Query("productID"))
 	if err != nil {
 		errorRes := response.ClientResponse(http.StatusBadRequest, "check parameters properly", nil, err.Error())
@@ -292,14 +330,15 @@ func (i *UserHandler) UpdateQuantityAdd(c *gin.Context) {
 }
 
 func (i *UserHandler) UpdateQuantityLess(c *gin.Context) {
-	id, err := strconv.Atoi(c.Query("id"))
-	if err != nil {
-		errorRes := response.ClientResponse(http.StatusBadRequest, "check parameters properly", nil, err.Error())
+	idValue, ok := c.Get("id")
+	if !ok {
+		errorRes := response.ClientResponse(http.StatusBadRequest, "check your id again", nil, nil)
 		c.JSON(http.StatusBadRequest, errorRes)
 		return
 	}
+	id, _ := idValue.(int)
 
-	inv, err := strconv.Atoi(c.Query("inventory"))
+	inv, err := strconv.Atoi(c.Query("productID"))
 	if err != nil {
 		errorRes := response.ClientResponse(http.StatusBadRequest, "check parameters properly", nil, err.Error())
 		c.JSON(http.StatusBadRequest, errorRes)

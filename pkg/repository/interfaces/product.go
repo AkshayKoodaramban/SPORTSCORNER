@@ -14,4 +14,5 @@ type ProductRepository interface {
 	CheckStock(product_id int) (int, error)
 	CheckPrice(product_id int) (float64, error)
 	ShowIndividualProducts(id string) (domain.Product, error)
+	CheckProductAvilability(pname string)bool
 }

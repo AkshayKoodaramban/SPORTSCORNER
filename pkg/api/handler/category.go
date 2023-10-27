@@ -25,6 +25,7 @@ func NewCategoryHandler(usecase services.CategoryUseCase) *CategoryHandler {
 func (Cat *CategoryHandler) AddCategory(c *gin.Context) {
 
 	var category domain.Category
+
 	if err := c.BindJSON(&category); err != nil {
 		errorRes := response.ClientResponse(http.StatusBadRequest, "fields provided are in wrong format", nil, err.Error())
 		c.JSON(http.StatusBadRequest, errorRes)

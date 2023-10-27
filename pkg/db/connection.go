@@ -39,7 +39,7 @@ func ConnectDatabase(cfg config.Config) (*gorm.DB, error) {
 		Address:         domain.Address{},
 		PaymentMethodID: 0,
 		PaymentMethod:   domain.PaymentMethod{},
-		CouponUsed:      "",
+		// CouponUsed:      "",
 		FinalPrice:      0,
 		OrderStatus:     "",
 		PaymentStatus:   "",

@@ -24,8 +24,8 @@ func NewProductHandler(usecase services.ProductUsecase) *ProductHandler {
 }
 
 func (i *ProductHandler) AddProduct(c *gin.Context) {
-
 	var product domain.Product
+
 	if err := c.BindJSON(&product); err != nil {
 		errorRes := response.ClientResponse(http.StatusBadRequest, "fields provided are in wrong format", nil, err.Error())
 		c.JSON(http.StatusBadRequest, errorRes)

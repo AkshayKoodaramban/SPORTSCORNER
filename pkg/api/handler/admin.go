@@ -2,9 +2,9 @@ package handler
 
 import (
 	"net/http"
-	"sportscorner/pkg/utils/response"
 	"sportscorner/pkg/usecase/services"
 	"sportscorner/pkg/utils/models"
+	"sportscorner/pkg/utils/response"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -97,4 +97,25 @@ func (ad *AdminHandler) UnBlockUser(c *gin.Context) {
 
 	successRes := response.ClientResponse(http.StatusOK, "Successfully unblocked the user", nil, nil)
 	c.JSON(http.StatusOK, successRes)
+}
+
+func (i *AdminHandler) NewPaymentMethod(c *gin.Context) {
+
+	var method models.NewPaymentMethod
+	if err := c.BindJSON(&method); err != nil {
+		errorRes := response.ClientResponse(http.StatusBadRequest, "fields provided are in wrong format", nil, err.Error())
+		c.JSON(http.StatusBadRequest, errorRes)
+		return
+	}
+
+	err := i.AdminUseCase.NewPaymentMethod(method.PaymentMethod)
+	if err != nil {
+		errorRes := response.ClientResponse(http.StatusBadRequest, "Could not add the payment method", nil, err.Error())
+		c.JSON(http.StatusBadRequest, errorRes)
+		return
+	}
+
+	successRes := response.ClientResponse(http.StatusOK, "Successfully added Payment Method", nil, nil)
+	c.JSON(http.StatusOK, successRes)
+
 }

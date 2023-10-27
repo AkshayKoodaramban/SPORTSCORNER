@@ -1,7 +1,6 @@
 package http
 
 import (
-	"log"
 	"sportscorner/pkg/api/handler"
 	"sportscorner/pkg/api/routes"
 
@@ -13,7 +12,10 @@ type ServerHTTP struct {
 }
 
 func NewServerHTTP(userHandler *handler.UserHandler, adminHandler *handler.AdminHandler, categoryHandler *handler.CategoryHandler, productHandler *handler.ProductHandler, otpHandler *handler.OtpHandler, CartHandler *handler.CartHandler, orderHandler *handler.OrderHandler, paymentHandler *handler.PaymentHandler) *ServerHTTP {
+
 	engine := gin.New()
+
+	engine.LoadHTMLGlob("templates/*.html")
 
 	// Use logger from Gin
 	engine.Use(gin.Logger())
@@ -28,9 +30,11 @@ func NewServerHTTP(userHandler *handler.UserHandler, adminHandler *handler.Admin
 	return &ServerHTTP{engine: engine}
 }
 
-func (s *ServerHTTP) Start() {
+func (s *ServerHTTP) Start() error {
 	err := s.engine.Run(":3000")
 	if err != nil {
-		log.Fatal("fk")
+		return err
 	}
+
+	return nil
 }

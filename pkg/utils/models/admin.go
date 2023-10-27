@@ -18,3 +18,7 @@ type UserDetailsAtAdmin struct {
 	Phone       string `json:"phone"`
 	BlockStatus bool   `json:"block_status"`
 }
+
+type NewPaymentMethod struct {
+	PaymentMethod string `json:"payment_method"`
+}

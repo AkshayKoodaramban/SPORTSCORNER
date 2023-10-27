@@ -164,9 +164,10 @@ func (ad *UserDatabase) FindCartQuantity(cart_id, inventory_id int) (int, error)
 
 	var quantity int
 	fmt.Println(cart_id, inventory_id)
-	if err := ad.DB.Raw("select quantity from line_items where cart_id=$1 and inventory_id=$2", cart_id, inventory_id).Scan(&quantity).Error; err != nil {		return 0, err
+	if err := ad.DB.Raw("select quantity from line_items where cart_id=$1 and inventory_id=$2", cart_id, inventory_id).Scan(&quantity).Error; err != nil {
+		return 0, err
 	}
-	
+
 	return quantity, nil
 
 }
@@ -205,9 +206,8 @@ func (ad *UserDatabase) GetCart(id int) ([]models.GetCart, error) {
 	return cart, nil
 
 }
-func (ad *UserDatabase) RemoveFromCart(id int) error {
-	fmt.Println(id)
-	if err := ad.DB.Exec("delete from line_items where cart_id=$1", id).Error; err != nil {
+func (ad *UserDatabase) RemoveFromCart(id, inv int) error {
+	if err := ad.DB.Exec("DELETE FROM line_items WHERE cart_id IN (SELECT id FROM carts WHERE user_id = $1) AND inventory_id = $2", id, inv).Error; err != nil {
 		return err
 	}
 
@@ -216,7 +216,7 @@ func (ad *UserDatabase) RemoveFromCart(id int) error {
 }
 
 func (ad *UserDatabase) UpdateQuantityAdd(id, inv_id int) error {
-	if err := ad.DB.Exec("UPDATE line_items SET quantity = quantity + 1 WHERE cart_id=$1 AND inventory_id=$2", id, inv_id).Error; err != nil {
+	if err := ad.DB.Exec("UPDATE line_items SET quantity = quantity + 1 WHERE cart_id IN (SELECT id FROM carts WHERE user_id = $1) AND inventory_id = $2", id, inv_id).Error; err != nil {
 		return err
 	}
 
@@ -225,8 +225,29 @@ func (ad *UserDatabase) UpdateQuantityAdd(id, inv_id int) error {
 
 func (ad *UserDatabase) UpdateQuantityLess(id, inv_id int) error {
 
-	if err := ad.DB.Exec("UPDATE line_items SET quantity = quantity - 1 WHERE cart_id = $1 AND inventory_id=$2", id, inv_id).Error; err != nil {
+	// Check the current quantity
+	var currentQuantity int
+	// err := ad.DB.
+	// 	Model(&models.LineItem{}).
+	// 	Where("cart_id IN (SELECT id FROM carts WHERE user_id = ?) AND inventory_id = ?", id, inv_id).
+	// 	Pluck("quantity", &currentQuantity).
+	// 	Error
+	// if err != nil {
+	// 	return err
+	// }
+	if err :=ad.DB.Exec("SELECT quantity FROM line_items li JOIN carts c ON li.cart_id = c.id WHERE c.user_id = $1 AND li.inventory_id = $2",id, inv_id).Scan(&currentQuantity).Error;err!=nil{
 		return err
+	}
+
+	// Check if the current quantity is zero
+	if currentQuantity == 0 {
+		return errors.New("Quantity is already zero, cannot decrement further")
+	}
+
+	// Perform the decrement update
+	errs := ad.DB.Exec("UPDATE line_items SET quantity = quantity - 1 WHERE cart_id IN (SELECT id FROM carts WHERE user_id = ?) AND inventory_id = ?", id, inv_id).Error
+	if errs != nil {
+		return errs
 	}
 
 	return nil

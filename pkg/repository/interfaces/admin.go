@@ -11,4 +11,6 @@ type AdminRepository interface {
 	GetUsers(page int, count int) ([]models.UserDetailsAtAdmin, error)
 	UpdateBlockUserByID(user domain.Users) error
 	UpdateUnBlockUserByID(user domain.Users) error
+	NewPaymentMethod(string) error
+
 }

@@ -2,13 +2,13 @@ package usecase
 
 import (
 	"errors"
-	"fmt"
 	"sportscorner/pkg/config"
 	"sportscorner/pkg/domain"
 	helper_interface "sportscorner/pkg/helper/interface"
 	"sportscorner/pkg/repository/interfaces"
 	"sportscorner/pkg/usecase/services"
 	"sportscorner/pkg/utils/models"
+	"strings"
 
 	"github.com/jinzhu/copier"
 	"golang.org/x/crypto/bcrypt"
@@ -36,6 +36,20 @@ func NewUserUseCase(repo interfaces.UserRepository, cfg config.Config, otp inter
 }
 
 func (u *UserUseCase) UserSignUp(user models.UserDetails) (models.TokenUsers, error) {
+
+	UserName:=strings.TrimSpace(user.Name)
+	if UserName==""{
+		return models.TokenUsers{},errors.New("name should not be empty")
+	}
+	Useremail:=strings.TrimSpace(user.Email)
+	if Useremail==""{
+		return models.TokenUsers{},errors.New("email should not be empty")
+	}
+	Userpassword:=strings.TrimSpace(user.Password)
+	if Userpassword==""{
+		return models.TokenUsers{},errors.New("password should not be empty")
+	}
+	
 	userExist := u.UserRepo.CheckUserAvailability(user.Email)
 	if userExist {
 		return models.TokenUsers{}, errors.New("user alredy exist")
@@ -206,7 +220,6 @@ func (u *UserUseCase) GetCart(id int) ([]models.GetCart, error) {
 		if err != nil {
 			return []models.GetCart{}, errors.New("internal error find quantity")
 		}
-		fmt.Println(q)
 		quantity = append(quantity, q)
 	}
 
@@ -235,7 +248,7 @@ func (u *UserUseCase) GetCart(id int) ([]models.GetCart, error) {
 		get.Category_id = categories[i]
 		get.Quantity = quantity[i]
 		get.Total = price[i]
-		get.DiscountedPrice = 0
+		// get.DiscountedPrice = 0
 
 		getcart = append(getcart, get)
 	}
@@ -261,9 +274,9 @@ func (u *UserUseCase) GetCart(id int) ([]models.GetCart, error) {
 
 }
 
-func (i *UserUseCase) RemoveFromCart(id int) error {
+func (i *UserUseCase) RemoveFromCart(id,inv_id int) error {
 
-	err := i.UserRepo.RemoveFromCart(id)
+	err := i.UserRepo.RemoveFromCart(id,inv_id)
 	if err != nil {
 		return err
 	}

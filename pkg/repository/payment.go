@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"fmt"
 	"sportscorner/pkg/repository/interfaces"
 
 	"gorm.io/gorm"
@@ -35,8 +36,10 @@ func (p *paymentRepository) FindPrice(order_id int) (float64, error) {
 }
 
 func (p *paymentRepository) UpdatePaymentDetails(orderID, paymentID, razorID string) error {
-	status := "PAID"
-	if err := p.DB.Exec(`UPDATE orders SET payment_status = $1 WHERE id = $2`, status, orderID).Error; err != nil {
+
+	fmt.Println(orderID)
+	status:="PAID"
+	if err := p.DB.Exec(`UPDATE orders SET payment_status = $1 WHERE id = $2`,status, orderID).Error; err != nil {
 		return err
 	}
 

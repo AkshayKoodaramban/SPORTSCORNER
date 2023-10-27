@@ -19,9 +19,16 @@ func NewProductUsecase(repo interfaces.ProductRepository) services.ProductUsecas
 }
 
 func (p *productUsecase) AddProduct(product domain.Product) (models.ProductResponse, error) {
+	pname:=product.ProductName
+	productExist:=p.repository.CheckProductAvilability(pname)
+	if productExist{
+		return models.ProductResponse{},errors.New("product alredy exist")
+	}
+	if product.Stock<0{
+		return models.ProductResponse{},errors.New("error in adding stock")
 
+	}
 	ProductResponse, err := p.repository.AddProduct(product)
-
 	if err != nil {
 		return models.ProductResponse{}, err
 	}
@@ -36,7 +43,7 @@ func (p *productUsecase) UpdateProduct(pid int, stock int) (models.ProductRespon
 	}
 
 	if !result {
-		return models.ProductResponse{}, errors.New("there is no inventory as you mentioned")
+		return models.ProductResponse{}, errors.New("there is no product as you mentioned")
 	}
 
 	newcat, err := p.repository.UpdateProduct(pid, stock)

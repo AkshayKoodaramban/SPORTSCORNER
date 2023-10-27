@@ -96,3 +96,12 @@ func (ad *adminRepository) UpdateUnBlockUserByID(user domain.Users) error {
 
 	return nil
 }
+func (i *adminRepository) NewPaymentMethod(pay string) error {
+
+	if err := i.DB.Exec("insert into payment_methods(payment_name)values($1)", pay).Error; err != nil {
+		return err
+	}
+
+	return nil
+
+}

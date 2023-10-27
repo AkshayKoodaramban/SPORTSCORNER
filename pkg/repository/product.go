@@ -37,6 +37,16 @@ func (p *ProductRepository) AddProduct(product domain.Product) (models.ProductRe
 
 	return productsResponse, nil
 }
+func(p *ProductRepository)CheckProductAvilability(pname string)bool{
+	var quantity int
+	err:=p.DB.Raw("SELECT COUNT(product_name) from products where product_name=?",pname).Scan(&quantity).Error
+	if err!=nil{
+		return false
+	}
+	return quantity>0
+}
+
+
 
 func (p *ProductRepository) CheckProduct(pid int) (bool, error) {
 	var k int
@@ -67,7 +77,7 @@ func (p *ProductRepository) UpdateProduct(pid int, stock int) (models.ProductRes
 	// Retrieve the update
 	var newdetails models.ProductResponse
 	var newstock int
-	if err := p.DB.Raw("SELECT stock FROM inventories WHERE id=?", pid).Scan(&newstock).Error; err != nil {
+	if err := p.DB.Raw("SELECT stock FROM products WHERE id=?", pid).Scan(&newstock).Error; err != nil {
 		return models.ProductResponse{}, err
 	}
 	newdetails.ProductID = pid

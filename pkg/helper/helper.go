@@ -28,12 +28,29 @@ func NewHelper(Config cfg.Config) helper.Helper {
 
 var client *twilio.RestClient
 
-type AuthCustomClaims struct {
-	Id        int    `json:"id"`
-	Email     string `json:"email"`
-	Role      string `json:"role"`
-	ExpiresAt int64  `json:"exp"` // This field represents the expiration time
-	jwt.StandardClaims
+func (h *Helper) GenerateTokenClients(user models.UserDetailsResponse) (string, error) {
+    // Define the claims for the JWT
+    claims := jwt.MapClaims{
+        "id":    user.Id,
+        "email": user.Email,
+        "role":  "client",
+        "exp":   time.Now().Add(time.Minute * 20).Unix(),
+        "iat":   time.Now().Unix(),
+    }
+
+    // Create a new JWT with the specified claims and signing method
+    token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+    // Sign the JWT with the secret key "secret"
+    tokenString, err := token.SignedString([]byte("secret"))
+
+    // Check for errors during token signing
+    if err != nil {
+        return "", err
+    }
+
+    // Return the generated token string and nil error (indicating success)
+    return tokenString, nil
 }
 
 func (h *Helper) GenerateTokenAdmin(admin models.AdminDetailsResponse) (string, int64, error) {
@@ -138,27 +155,6 @@ func (h *Helper) TwilioVerifyOTP(serviceID string, code string, phone string) er
 
 }
 
-func (h *Helper) GenerateTokenClients(user models.UserDetailsResponse) (string, error) {
-	claims := &AuthCustomClaims{
-		Id:    user.Id,
-		Email: user.Email,
-		Role:  "client",
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(time.Hour * 48).Unix(),
-			IssuedAt:  time.Now().Unix(),
-		},
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString([]byte("secret"))
-
-	if err != nil {
-		return "", err
-	}
-
-	return tokenString, nil
-}
-
 func (h *Helper) PasswordHashing(password string) (string, error) {
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), 10)
@@ -184,6 +180,36 @@ func (h *Helper) Copy(a *models.UserDetailsResponse, b *models.UserSignInRespons
 	}
 
 	return *a, nil
+}
+
+func ExtractUserIDFromToken(tokenString, secretKey string) (int, error) {
+	// Parse the token
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		return []byte(secretKey), nil
+	})
+
+	if err != nil {
+		return 0, err
+	}
+
+	// Check if the token is valid
+	if !token.Valid {
+		return 0, errors.New("internal  error")
+	}
+
+	// Extract the user ID from the claims
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return 0, errors.New("internal  error")
+	}
+
+	userIDfloat64, ok := claims["id"].(float64) // Assuming "Id" is the key for user ID
+	if !ok {
+		return 0, errors.New("internal error")
+	}
+	userID := int(userIDfloat64)
+
+	return userID, nil
 }
 
 // package helper

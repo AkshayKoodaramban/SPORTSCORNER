@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"sportscorner/pkg/config"
 	"sportscorner/pkg/di"
@@ -24,11 +23,11 @@ func main() {
 	server, diErr := di.InitializeAPI(config)
 	if diErr != nil {
 		log.Fatal("cannot start server: ", diErr)
-		fmt.Println("1")
 	} else {
-		fmt.Println("2")
-
-		server.Start()
+		err := server.Start()
+		if err != nil {
+			log.Fatal("problem starting server")
+		}
 	}
 
 }

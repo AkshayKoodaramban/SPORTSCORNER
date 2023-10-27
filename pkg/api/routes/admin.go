@@ -32,5 +32,15 @@ func AdminRoutes(engine *gin.RouterGroup, adminHandler *handler.AdminHandler, pr
 			productmanagement.PUT("/update", productHandler.UpdateProduct)
 			productmanagement.DELETE("/delete", productHandler.DeleteProduct)
 		}
+		payment := engine.Group("/payment")
+		{
+			payment.POST("/payment-method/new", adminHandler.NewPaymentMethod)
+		}
+
+		orders := engine.Group("/orders")
+		{
+			orders.GET("", orderHandler.AdminOrders)
+			orders.PUT("/edit/status", orderHandler.EditOrderStatus)
+		}
 	}
 }

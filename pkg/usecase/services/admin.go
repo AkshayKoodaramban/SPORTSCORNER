@@ -10,4 +10,5 @@ type AdminUseCase interface {
 	Blockuser(id string) error
 	UnBlockUser(id string) error
 	GetUsers(page int, count int) ([]models.UserDetailsAtAdmin, error)
+	NewPaymentMethod(string) error
 }

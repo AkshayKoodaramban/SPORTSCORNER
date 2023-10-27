@@ -108,3 +108,14 @@ func (ad *adminUsecase) GetUsers(page int, count int) ([]models.UserDetailsAtAdm
 
 	return userDetails, nil
 }
+
+func (i *adminUsecase) NewPaymentMethod(inv string) error {
+
+	err := i.adminRepository.NewPaymentMethod(inv)
+	if err != nil {
+		return err
+	}
+
+	return nil
+
+}

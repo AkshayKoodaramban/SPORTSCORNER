@@ -1,6 +1,8 @@
 package usecase
 
 import (
+	"fmt"
+	"log"
 	"sportscorner/pkg/repository/interfaces"
 	"sportscorner/pkg/usecase/services"
 	"sportscorner/pkg/utils/models"
@@ -20,6 +22,7 @@ func NewPaymentUseCase(repo interfaces.PaymentRepository) services.PaymentUseCas
 }
 
 func (p *paymentUsecase) MakePaymentRazorPay(orderID string, userID string) (models.OrderPaymentDetails, error) {
+
 	var orderDetails models.OrderPaymentDetails
 	//get orderid
 	newid, err := strconv.Atoi(orderID)
@@ -33,7 +36,6 @@ func (p *paymentUsecase) MakePaymentRazorPay(orderID string, userID string) (mod
 	if err != nil {
 		return models.OrderPaymentDetails{}, err
 	}
-
 	orderDetails.UserID = newuserid
 
 	//get username
@@ -41,7 +43,6 @@ func (p *paymentUsecase) MakePaymentRazorPay(orderID string, userID string) (mod
 	if err != nil {
 		return models.OrderPaymentDetails{}, err
 	}
-
 	orderDetails.Username = username
 
 	//get total
@@ -51,8 +52,12 @@ func (p *paymentUsecase) MakePaymentRazorPay(orderID string, userID string) (mod
 	}
 
 	orderDetails.FinalPrice = newfinal
-
 	client := razorpay.NewClient("rzp_test_YFcgEYkDD4GAOh", "89xll4vuGit4Zbm4w3ogD3Cp")
+	if client == nil {
+		log.Fatal("empty client")
+	}
+
+	fmt.Println("final price", orderDetails.FinalPrice)
 
 	data := map[string]interface{}{
 		"amount":   int(orderDetails.FinalPrice) * 100,
@@ -62,13 +67,14 @@ func (p *paymentUsecase) MakePaymentRazorPay(orderID string, userID string) (mod
 
 	body, err := client.Order.Create(data, nil)
 	if err != nil {
-		return models.OrderPaymentDetails{}, nil
+		return models.OrderPaymentDetails{}, err
 	}
 
 	razorPayOrderID := body["id"].(string)
 
 	orderDetails.Razor_id = razorPayOrderID
 
+	fmt.Println("order",orderDetails)
 	return orderDetails, nil
 }
 

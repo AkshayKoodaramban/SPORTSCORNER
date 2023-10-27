@@ -8,13 +8,13 @@ import (
 )
 
 type cartUseCase struct {
-	repo                interfaces.CartRepository
+	repo              interfaces.CartRepository
 	productRepository interfaces.ProductRepository
 }
 
-func NewCartUseCase(repo interfaces.CartRepository, productRepo interfaces.ProductRepository) services.CartUseCase{
+func NewCartUseCase(repo interfaces.CartRepository, productRepo interfaces.ProductRepository) services.CartUseCase {
 	return &cartUseCase{
-		repo:                repo,
+		repo:              repo,
 		productRepository: productRepo,
 	}
 }
@@ -39,8 +39,13 @@ func (i *cartUseCase) AddToCart(user_id, inventory_id int) error {
 	if cart_id == 0 {
 		cart_id, err = i.repo.CreateNewCart(user_id)
 		if err != nil {
-			return errors.New("cannot create cart fro user")
+			return errors.New("cannot create cart for user")
 		}
+	}
+
+	count := i.repo.CheckProductInCart(user_id, inventory_id)
+	if count {
+		return errors.New("product alredy in cart")
 	}
 
 	//add product to line items
@@ -63,7 +68,12 @@ func (i *cartUseCase) CheckOut(id int) (models.CheckOut, error) {
 		return models.CheckOut{}, err
 	}
 
-	products, err := i.repo.GetCart(id)
+	cartID, err := i.repo.GetCartId(id)
+	if err != nil {
+		return models.CheckOut{}, err
+	}
+
+	products, err := i.repo.GetCart(cartID)
 	if err != nil {
 		return models.CheckOut{}, err
 	}

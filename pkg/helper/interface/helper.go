@@ -12,4 +12,5 @@ type Helper interface {
 	GenerateTokenClients(user models.UserDetailsResponse) (string, error)
 	PasswordHashing(string) (string, error)
 	CompareHashAndPassword(a string, b string) error
+	// GetUserIDFromToken(tokenString string,secretKey string)(string,error)
 }

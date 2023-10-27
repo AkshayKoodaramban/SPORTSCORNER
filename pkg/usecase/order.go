@@ -29,7 +29,7 @@ func (i *orderUseCase) GetOrders(id int) ([]domain.Order, error) {
 
 }
 
-func (i *orderUseCase) OrderItemsFromCart(userid int, addressid int, paymentid int, couponID int) error {
+func (i *orderUseCase) OrderItemsFromCart(userid int, addressid int, paymentid int) error {
 
 	cart, err := i.userUseCase.GetCart(userid)
 	if err != nil {
@@ -68,5 +68,54 @@ func (i *orderUseCase) CancelOrder(id int) error {
 		return err
 	}
 	return nil
+
+}
+
+func (i *orderUseCase) EditOrderStatus(status string, id int) error {
+
+	err := i.orderRepository.EditOrderStatus(status, id)
+	if err != nil {
+		return err
+	}
+	return nil
+
+}
+
+func (i *orderUseCase) AdminOrders() (domain.AdminOrdersResponse, error) {
+
+	var response domain.AdminOrdersResponse
+
+	pending, err := i.orderRepository.AdminOrders("PENDING")
+	if err != nil {
+		return domain.AdminOrdersResponse{}, err
+	}
+
+	shipped, err := i.orderRepository.AdminOrders("SHIPPED")
+	if err != nil {
+		return domain.AdminOrdersResponse{}, err
+	}
+
+	delivered, err := i.orderRepository.AdminOrders("DELIVERED")
+	if err != nil {
+		return domain.AdminOrdersResponse{}, err
+	}
+
+	returned, err := i.orderRepository.AdminOrders("RETURNED")
+	if err != nil {
+		return domain.AdminOrdersResponse{}, err
+	}
+
+	canceled, err := i.orderRepository.AdminOrders("CANCELED")
+	if err != nil {
+		return domain.AdminOrdersResponse{}, err
+	}
+
+	response.Canceled = canceled
+	response.Pending = pending
+	response.Shipped = shipped
+	response.Returned = returned
+	response.Delivered = delivered
+
+	return response, nil
 
 }
