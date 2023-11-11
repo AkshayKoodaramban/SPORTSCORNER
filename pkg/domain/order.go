@@ -16,9 +16,11 @@ type Order struct {
 	PaymentMethodID uint          `json:"paymentmethod_id"`
 	PaymentMethod   PaymentMethod `json:"-" gorm:"foreignkey:PaymentMethodID"`
 	// CouponUsed      string        `json:"coupon_used" gorm:"default:null"`
-	FinalPrice      float64       `json:"price"`
-	OrderStatus     string        `json:"order_status" gorm:"order_status:4;default:'PENDING';check:order_status IN ('PENDING', 'SHIPPED','DELIVERED','CANCELED','RETURNED')"`
-	PaymentStatus   string        `json:"payment_status" gorm:"payment_status:2;default:'NOT PAID';check:payment_status IN ('PAID', 'NOT PAID')"`
+	FinalPrice    float64 `json:"price"`
+	OrderStatus   string  `json:"order_status" gorm:"order_status:4;default:'PENDING';check:order_status IN ('PENDING', 'SHIPPED','DELIVERED','CANCELED','RETURNED')"`
+	PaymentStatus string  `json:"payment_status" gorm:"payment_status:2;default:'NOT PAID';check:payment_status IN ('PAID', 'NOT PAID')"`
+	OrderItems      []OrderItem   `json:"order_items" gorm:"foreignKey:OrderID;constraint:OnDelete:CASCADE"`
+
 }
 
 type OrderItem struct {
@@ -40,14 +42,12 @@ type AdminOrdersResponse struct {
 }
 
 type OrderDetails struct {
-	Id            int     `json:"order-id"`
+	Id           float64  `json:"order_id"`
 	Username      string  `json:"name"`
 	Address       string  `json:"address"`
 	Paymentmethod string  `json:"payment_method"`
 	Total         float64 `json:"total"`
-	
 }
-
 
 type CombinedOrderDetails struct {
 	OrderId        string  `json:"order_id"`

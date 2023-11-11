@@ -24,6 +24,7 @@ type UserRepository interface {
 
 	GetCart(id int) ([]models.GetCart, error)
 	RemoveFromCart(id,inv_id int) error
+	RemoveCart(id int) error
 	UpdateQuantityAdd(id, inv_id int) error
 	UpdateQuantityLess(id, inv_id int) error
 

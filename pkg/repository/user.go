@@ -214,6 +214,14 @@ func (ad *UserDatabase) RemoveFromCart(id, inv int) error {
 	return nil
 
 }
+func (ad *UserDatabase) RemoveCart(id int) error {
+	if err := ad.DB.Exec("DELETE FROM line_items WHERE cart_id IN (SELECT id FROM carts WHERE user_id = $1)", id).Error; err != nil {
+		return err
+	}
+
+	return nil
+
+}
 
 func (ad *UserDatabase) UpdateQuantityAdd(id, inv_id int) error {
 	if err := ad.DB.Exec("UPDATE line_items SET quantity = quantity + 1 WHERE cart_id IN (SELECT id FROM carts WHERE user_id = $1) AND inventory_id = $2", id, inv_id).Error; err != nil {

@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"fmt"
 	"sportscorner/pkg/domain"
 	"sportscorner/pkg/repository/interfaces"
 	"sportscorner/pkg/utils/models"
@@ -96,10 +95,31 @@ func (i *orderRepository) EditOrderStatus(status string, id int) error {
 func (or *orderRepository) AdminOrders(status string) ([]domain.OrderDetails, error) {
 
 	var orders []domain.OrderDetails
-	if err := or.DB.Raw("SELECT users.name AS username,orders.id AS order_id, CONCAT(addresses.house_name, ' ,', addresses.street, ' , ', addresses.city) AS address, payment_methods.payment_name AS payment_method, orders.final_price As total FROM orders JOIN users ON users.id = orders.user_id JOIN payment_methods ON payment_methods.id = orders.payment_method_id JOIN addresses ON orders.address_id = addresses.id WHERE order_status = $1", status).Scan(&orders).Error; err != nil {
+	// if err := or.DB.Raw("SELECT users.name AS username,orders.id AS 'order-id' CONCAT(addresses.house_name, ' ,', addresses.street, ' , ', addresses.city) AS address, payment_methods.payment_name AS payment_method, orders.final_price As total FROM orders JOIN users ON users.id = orders.user_id JOIN payment_methods ON payment_methods.id = orders.payment_method_id JOIN addresses ON orders.address_id = addresses.id WHERE order_status = $1", status).Scan(&orders).Error; err != nil {
+	// 	return []domain.OrderDetails{}, err
+	// }
+	// if err := or.DB.Raw("SELECT orders.id AS order_id from orders where order_status = $1", status).Scan(&orders).Error; err != nil {
+	// 	return []domain.OrderDetails{}, err
+	// }
+	if err := or.DB.Raw(`
+    SELECT
+        orders.id AS order_id,
+        users.name AS username,
+        CONCAT(addresses.house_name, ', ', addresses.street, ', ', addresses.city) AS address,
+        payment_methods.payment_name AS payment_method,
+        orders.final_price AS total
+    FROM
+        orders
+    JOIN
+        users ON users.id = orders.user_id
+    JOIN
+        payment_methods ON payment_methods.id = orders.payment_method_id
+    JOIN
+        addresses ON orders.address_id = addresses.id
+    WHERE
+        orders.order_status = $1`, status).Scan(&orders).Error; err != nil {
 		return []domain.OrderDetails{}, err
 	}
-	fmt.Println(orders)
-	
+
 	return orders, nil
 }

@@ -198,7 +198,7 @@ func (u *UserUseCase) GetCart(id int) ([]models.GetCart, error) {
 	if err != nil {
 		return []models.GetCart{}, errors.New("internal error to find cart")
 	}
-	//find products inide cart
+	//find products inside cart
 	products, err := u.UserRepo.GetProductsInCart(cart_id)
 	if err != nil {
 		return []models.GetCart{}, errors.New("internal error find product")
@@ -277,6 +277,16 @@ func (u *UserUseCase) GetCart(id int) ([]models.GetCart, error) {
 func (i *UserUseCase) RemoveFromCart(id,inv_id int) error {
 
 	err := i.UserRepo.RemoveFromCart(id,inv_id)
+	if err != nil {
+		return err
+	}
+
+	return nil
+
+}
+func (i *UserUseCase) RemoveCart(id int) error {
+
+	err := i.UserRepo.RemoveCart(id)
 	if err != nil {
 		return err
 	}

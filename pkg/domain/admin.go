@@ -9,9 +9,9 @@ type Admin struct {
 	Password string `json:"password" gorm:"validate:required"`
 }
 
+
 type TokenAdmin struct {
 	Admin models.AdminDetailsResponse
 	Token string
 	Expire int64
-
 }

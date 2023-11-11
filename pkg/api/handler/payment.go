@@ -21,9 +21,17 @@ func NewPaymentHandler(use services.PaymentUseCase) *PaymentHandler {
 
 func (p *PaymentHandler) MakePaymentRazorPay(c *gin.Context) {
 
-	orderID := c.Query("id")
+	orderID := c.Query("order_id")
 	userID := c.Query("user_id")
-	
+	// idValue, ok := c.Get("id")
+	// if !ok {
+	// 	errorRes := response.ClientResponse(http.StatusBadRequest, "check your id again", nil, nil)
+	// 	c.JSON(http.StatusBadRequest, errorRes)
+	// 	return
+	// }
+	// id, _ := idValue.(string)
+	// fmt.Println("id is ", id)
+
 	orderDetail, err := p.usecase.MakePaymentRazorPay(orderID, userID)
 	if err != nil {
 		errorRes := response.ClientResponse(http.StatusInternalServerError, "could not generate order details", nil, err.Error())

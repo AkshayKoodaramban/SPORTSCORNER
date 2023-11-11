@@ -57,6 +57,8 @@ func UserRoutes(engine *gin.RouterGroup, userHandler *handler.UserHandler, Produ
 		order := engine.Group("/order")
 		{
 			order.GET("", orderHandler.GetOrders)
+			order.DELETE("", orderHandler.CancelOrder)
+			// order.PUT("/return", orderHandler.ReturnOrder)
 
 		}
 
